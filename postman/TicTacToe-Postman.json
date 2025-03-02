@@ -41,7 +41,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{}",
+					"raw": "{\r\n  \"playerX\": \"Player1\",\r\n  \"playerO\": \"Player2\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -139,6 +139,15 @@
 			"request": {
 				"method": "DELETE",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "{{base_url}}/games/{{gameId}}",
 					"host": [

@@ -1,5 +1,5 @@
-import express from 'express';
-import { TicTacToeTree, TreeNode } from './utils/ticTacToeTree.mjs';
+const express = require('express');
+const { TicTacToeTree } = require('./utils/ticTacToeTree.mjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
