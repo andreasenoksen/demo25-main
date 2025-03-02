@@ -1,105 +1,61 @@
-# Tic-Tac-Toe API
+# Tic-Tac-Toe API & PWA
 
-Dette er en enkel Tic-Tac-Toe API-tjeneste som lar brukere opprette og spille Tic-Tac-Toe via HTTP-forespørsler. 
+This is a Tic-Tac-Toe game built with Node.js and Express. The application functions as both a REST API for managing games and as a Progressive Web App (PWA) that can be installed on your device.
 
-## Live Demo (Prod - Render)
+**Live Version:** [https://demo25-main.onrender.com/](https://demo25-main.onrender.com/)
 
-API Base URL: [https://demo25-main.onrender.com](https://demo25-main.onrender.com)
+## Installation and Running the Project
 
-## Prosjektstruktur
-- `server.js` - Hovedserverfilen som håndterer API-endepunktene.
-- `utils/ticTacToeTree.mjs` - Spillmotor for Tic-Tac-Toe, inkluderer trestrukturen for spillet.
-- `public/index.html` - Enkel frontend for å spille Tic-Tac-Toe.
-- `postman/TicTacToe-Postman.json` - Postman-kolleksjon for testing av API-et.
+To run the project locally, follow these steps:
 
-## Hvordan kjøre lokalt
+### 1. Download the Project
+Clone the repository from GitHub:
 
-### 1. Klone repoet
 ```sh
- git clone https://github.com/andreasenoksen/demo25-main.git
- cd demo25-main
+git clone https://github.com/andreasenoksen/demo25-main.git
+cd demo25-main
 ```
 
-### 2. Installer avhengigheter
+### 2. Install Dependencies
+Run the following command to install necessary packages:
+
 ```sh
- npm install
+npm install
 ```
 
-### 3. Start serveren
+### 3. Start the Server
+To start the server locally, use:
+
 ```sh
- node server.js
+npm start
 ```
-Serveren vil kjøre på http://localhost:3000.
 
-## API Endepunkter
+The server will run on `http://localhost:3000`.
 
-### 1. Opprett et nytt spill
-- Metode: `POST`
-- URL: `/games`
-- Respons:
-  ```json
-  {
-    "gameId": "1712034123456",
-    "board": [null, null, null, null, null, null, null, null, null]
-  }
-  ```
+## How the Game Works
 
-### 2. Hent status for et spill
-- Metode: `GET`
-- URL: `/games/{gameId}`
-- Respons:
-  ```json
-  {
-    "board": ["X", null, null, "O", null, null, null, null, null]
-  }
-  ```
+The game works by allowing a player to start a new game via the API. Players can then make moves, and the system will check if there is a winner. Results can be stored in a leaderboard.
 
-### 3. Gjør et trekk
-- Metode: `PUT`
-- URL: `/games/{gameId}/move`
-- Body:
-  ```json
-  {
-    "moveIndex": 0,
-    "player": "X"
-  }
-  ```
-- Respons:
-  ```json
-  {
-    "board": ["X", null, null, null, null, null, null, null, null],
-    "winner": null
-  }
-  ```
+### Game Flow:
+1. Start a new game.
+2. Players make moves by submitting their chosen position.
+3. The system validates the move and updates the game board.
+4. When a player wins, the result is recorded in the leaderboard.
+5. Games can be retrieved, deleted, or updated via the API.
 
-### 4. Registrer en vinner
-- Metode: `POST`
-- URL: `/games/{gameId}/winner`
-- Body:
-  ```json
-  {
-    "winner": "X"
-  }
-  ```
-- Respons:
-  ```json
-  {
-    "message": "Leaderboard updated: X now has 5 wins."
-  }
-  ```
+## PWA (Progressive Web App)
 
-### 5. Hent leaderboard
-- Metode: `GET`
-- URL: `/leaderboard`
-- Respons:
-  ```json
-  {
-    "X": 5,
-    "O": 2
-  }
-  ```
+This application is a PWA, meaning you can install it as an app on your device. This allows you to play offline.
 
-### 6. Slett et spill
-- Metode: `DELETE`
-- URL: `/games/{gameId}`
-- Respons: `204 No Content`
+To install:
+1. Open the application in a browser that supports PWA (e.g., Chrome or Edge).
+2. Click the install button that appears in the address bar.
+
+## Technologies Used
+- HTML
+- CSS
+- JavaScript
+- Node.js
+- Express
+- Socket.io
+- Service Workers for PWA support
