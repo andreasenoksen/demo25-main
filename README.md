@@ -109,22 +109,3 @@ For enklere testing, importer Postman-kolleksjonen fra:
 ```
 postman/TicTacToe-Postman.json
 ```
-
-## Deploy til Render (For fremtidige oppdateringer)
-
-### 1. Push endringer til GitHub
-```sh
- git add .
- git commit -m "Oppdateringer i Tic-Tac-Toe API"
- git push origin main
-```
-
-### 2. Deploy siste versjon på Render
-1. Gå til [Render Dashboard](https://dashboard.render.com)
-2. Velg prosjektet `demo25-main`
-3. Klikk "Manual Deploy" → "Deploy Latest Commit"
-4. Test oppdateringene!
-
----
-
-Prosjektet er nå klart til bruk!
