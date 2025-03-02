@@ -103,9 +103,3 @@ Serveren vil kjøre på http://localhost:3000.
 - Metode: `DELETE`
 - URL: `/games/{gameId}`
 - Respons: `204 No Content`
-
-## Postman Kolleksjon
-For enklere testing, importer Postman-kolleksjonen fra:
-```
-postman/TicTacToe-Postman.json
-```
