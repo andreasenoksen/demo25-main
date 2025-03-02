@@ -8,6 +8,10 @@ app.use(express.json());
 let games = {};
 let leaderboard = {};
 
+app.get("/", (req, res) => {
+    res.send("Tic-Tac-Toe API is running! 🎲");
+});
+
 app.post('/games', (req, res) => {
     const gameId = Date.now().toString();
     games[gameId] = new TicTacToeTree();
