@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 50px auto;
+            width: 320px;
+        }
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            background-color: #3700B3;
+            border: none;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            color: #FFFFFF;
+            transition: transform 0.2s ease;
+            border-radius: 10px;
+        }
+        .cell:hover {
+            transform: scale(1.1);
+        }
+        .winner {
+            background-color: #4CAF50 !important;
+        }
+        .button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #3700B3;
+            color: #FFFFFF;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Velkommen til Tic-Tac-Toe</h1>
+        <button class="button" id="start-game">Start Spill</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <h1>Tic-Tac-Toe</h1>
+        <div id="status">Spiller X sin tur</div>
+        <div class="board" id="board"></div>
+    </div>
+
+    <div id="winner-screen" class="hidden">
+        <h1 id="winner-text"></h1>
+        <button class="button" id="restart">Spill på nytt</button>
+    </div>
+    
+    <script>
+        const startScreen = document.getElementById("start-screen");
+        const gameScreen = document.getElementById("game-screen");
+        const winnerScreen = document.getElementById("winner-screen");
+        const winnerText = document.getElementById("winner-text");
+        const startGameBtn = document.getElementById("start-game");
+        const restartBtn = document.getElementById("restart");
+        const board = document.getElementById("board");
+        const status = document.getElementById("status");
+
+        let currentPlayer = "X";
+        let gameBoard = Array(9).fill(null);
+
+        startGameBtn.addEventListener("click", () => {
+            startScreen.classList.add("hidden");
+            gameScreen.classList.remove("hidden");
+            createBoard();
+        });
+
+        function createBoard() {
+            board.innerHTML = "";
+            gameBoard.forEach((cell, index) => {
+                const cellElement = document.createElement("button");
+                cellElement.classList.add("cell");
+                cellElement.dataset.index = index;
+                cellElement.innerText = cell || "";
+                cellElement.disabled = cell !== null;
+                cellElement.addEventListener("click", handleMove);
+                board.appendChild(cellElement);
+            });
+        }
+
+        function handleMove(event) {
+            const index = event.target.dataset.index;
+            if (!gameBoard[index]) {
+                gameBoard[index] = currentPlayer;
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+                status.innerText = `Spiller ${currentPlayer} sin tur`;
+                createBoard();
+                checkWinner();
+            }
+        }
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                    showWinner(gameBoard[a]);
+                    return;
+                }
+            }
+
+            if (!gameBoard.includes(null)) {
+                showWinner("Uavgjort");
+            }
+        }
+
+        function showWinner(winner) {
+            gameScreen.classList.add("hidden");
+            winnerScreen.classList.remove("hidden");
+            winnerText.innerText = winner === "Uavgjort" ? "Det ble uavgjort!" : `Spiller ${winner} vant!`;
+        }
+
+        restartBtn.addEventListener("click", () => {
+            gameBoard = Array(9).fill(null);
+            currentPlayer = "X";
+            winnerScreen.classList.add("hidden");
+            gameScreen.classList.remove("hidden");
+            status.innerText = "Spiller X sin tur";
+            createBoard();
+        });
+    </script>
+</body>
+</html>
