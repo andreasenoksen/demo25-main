@@ -2,162 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe</title>
-    <link rel="manifest" href="/public/manifest.json">
-    <script src="/public/script.js" defer></script>
+    <title>Tic-Tac-Toe Game</title>
     <style>
         body {
             background-color: #121212;
             color: #FFFFFF;
             font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding-top: 30px;
+        }
+
+        .container {
             text-align: center;
         }
+
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
             gap: 5px;
-            margin: 50px auto;
-            width: 320px;
+            margin-top: 20px;
         }
+
         .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #0804fc;
+            font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2em;
-            background-color: #3700B3;
-            border: none;
-            width: 100px;
-            height: 100px;
             cursor: pointer;
-            color: #FFFFFF;
-            transition: transform 0.2s ease;
-            border-radius: 10px;
         }
-        .cell:hover {
-            transform: scale(1.1);
-        }
-        .winner {
-            background-color: #4CAF50 !important;
-        }
-        .button {
+
+        .leaderboard, .history {
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #3700B3;
-            color: #FFFFFF;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
+            text-align: left;
         }
-        .hidden {
-            display: none;
+
+        .highlight {
+            color: #0804fc;
         }
     </style>
 </head>
 <body>
-    <div id="start-screen">
-        <h1>Velkommen til Tic-Tac-Toe</h1>
-        <button class="button" id="start-game">Start Spill</button>
-    </div>
+    <div class="container">
+        <h1>Tic-Tac-Toe Game</h1>
+        
+        <input id="playerX" placeholder="Player X Name">
+        <input id="playerO" placeholder="Player O Name">
+        <button onclick="startGame()">Start Game</button>
 
-    <div id="game-screen" class="hidden">
-        <h1>Tic-Tac-Toe</h1>
-        <div id="status">Spiller X sin tur</div>
         <div class="board" id="board"></div>
+        <div id="status"></div>
+
+        <div class="leaderboard">
+            <h3 class="highlight">Leaderboard</h3>
+            <ul id="leaderboard"></ul>
+        </div>
+
+        <div class="history">
+            <h3 class="highlight">Game History</h3>
+            <ul id="history"></ul>
+        </div>
     </div>
 
-    <div id="winner-screen" class="hidden">
-        <h1 id="winner-text"></h1>
-        <button class="button" id="restart">Spill på nytt</button>
-    </div>
     <script>
-        const baseUrl = "https://demo25-main.onrender.com/api";
-        let gameId = null;
-        let board = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
         let currentPlayer = 'X';
-        let gameStatus = 'ongoing';
-    
-        // Start New Game
-        async function startNewGame() {
-            const response = await fetch(`${baseUrl}/games`, {
+        let boardState = ["", "", "", "", "", "", "", "", ""];
+
+        async function startGame() {
+            const playerX = document.getElementById('playerX').value;
+            const playerO = document.getElementById('playerO').value;
+            await fetch('/api/games', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    player_x: "Alice",
-                    player_o: "Bob",
-                    board: board.join(''),
-                    status: gameStatus,
-                })
+                body: JSON.stringify({ player_x: playerX, player_o: playerO, board: "", status: "ongoing" })
             });
-    
-            const data = await response.json();
-            gameId = data.id;
-            console.log("Game started with ID:", gameId);
-        }
-    
-        // Update Game after a Move
-        async function updateGame() {
-            if (!gameId) return;
-    
-            await fetch(`${baseUrl}/games/${gameId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    board: board.join(''),
-                    status: gameStatus,
-                })
-            });
-        }
-    
-        // Load Game State on Page Load
-        async function loadGame() {
-            const savedGameId = localStorage.getItem("gameId");
-            if (!savedGameId) return;
-    
-            const response = await fetch(`${baseUrl}/games/${savedGameId}`);
-            if (!response.ok) return;
-    
-            const data = await response.json();
-            board = data.board.split('');
-            gameId = data.id;
-            gameStatus = data.status;
             renderBoard();
+            loadLeaderboard();
+            loadHistory();
         }
-    
-        // Handle Board Rendering
+
         function renderBoard() {
-            board.forEach((cell, index) => {
-                const cellElement = document.getElementById(`cell-${index}`);
-                cellElement.innerText = cell === '-' ? '' : cell;
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            boardState.forEach((cell, index) => {
+                const cellDiv = document.createElement('div');
+                cellDiv.className = 'cell';
+                cellDiv.innerText = cell;
+                cellDiv.onclick = () => makeMove(index);
+                board.appendChild(cellDiv);
             });
         }
-    
-        // Handle Cell Clicks
-        function handleCellClick(index) {
-            if (board[index] === '-' && gameStatus === 'ongoing') {
-                board[index] = currentPlayer;
+
+        function makeMove(index) {
+            if (!boardState[index]) {
+                boardState[index] = currentPlayer;
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
                 renderBoard();
-                updateGame(); // Save move to the backend
+                document.getElementById('status').innerText = `Player ${currentPlayer}'s turn`;
             }
         }
-    
-        // Register Event Listeners
-        document.getElementById('start-game').addEventListener('click', () => {
-            startNewGame();
-            localStorage.setItem("gameId", gameId);
-        });
-    
-        document.querySelectorAll('.cell').forEach((cell, index) => {
-            cell.addEventListener('click', () => handleCellClick(index));
-        });
-    
-        // Load saved game on page load
-        window.onload = () => {
-            loadGame();
-        };
-    </script>    
+
+        async function loadLeaderboard() {
+            const res = await fetch('/api/leaderboard');
+            const data = await res.json();
+            const list = document.getElementById('leaderboard');
+            list.innerHTML = '';
+            data.forEach(player => {
+                const li = document.createElement('li');
+                li.innerText = `${player.player}: ${player.wins}`;
+                list.appendChild(li);
+            });
+        }
+
+        async function loadHistory() {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            const list = document.getElementById('history');
+            list.innerHTML = '';
+            data.forEach(game => {
+                const li = document.createElement('li');
+                li.innerText = `Game ID ${game.id} - ${game.player_x} vs ${game.player_o}`;
+                list.appendChild(li);
+            });
+        }
+    </script>
 </body>
 </html>

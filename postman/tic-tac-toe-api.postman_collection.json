@@ -7,41 +7,13 @@
 	},
 	"item": [
 		{
-			"name": "Create New Game",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"pm.sendRequest({\r",
-							"    url: pm.environment.get(\"base_url\") + \"/games\",\r",
-							"    method: 'POST',\r",
-							"    header: {\r",
-							"        'Content-Type': 'application/json'\r",
-							"    },\r",
-							"    body: {}\r",
-							"}, function (err, res) {\r",
-							"    if (err) {\r",
-							"        console.log(\"Error creating game:\", err);\r",
-							"    } else {\r",
-							"        var responseJson = res.json();\r",
-							"        pm.environment.set(\"gameId\", responseJson.gameId);\r",
-							"        console.log(\"Game ID saved:\", responseJson.gameId);\r",
-							"    }\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
+			"name": "Create Game",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"playerX\": \"Alice\",\r\n  \"playerO\": \"Bob\",\r\n  \"board\": \"---------\",\r\n  \"status\": \"ongoing\"\r\n}\r\n",
+					"raw": "{\r\n  \"player_x\": \"Alice\",\r\n  \"player_o\": \"Bob\",\r\n  \"board\": \"\",\r\n  \"status\": \"ongoing\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -65,133 +37,6 @@
 			"response": []
 		},
 		{
-			"name": "Get Game Status",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://demo25-main.onrender.com/api/games/9",
-					"protocol": "https",
-					"host": [
-						"demo25-main",
-						"onrender",
-						"com"
-					],
-					"path": [
-						"api",
-						"games",
-						"9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Make a Move",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"board\": \"XOXOX----\",\r\n  \"status\": \"in-progress\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://demo25-main.onrender.com/api/games/9",
-					"protocol": "https",
-					"host": [
-						"demo25-main",
-						"onrender",
-						"com"
-					],
-					"path": [
-						"api",
-						"games",
-						"9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Register Winner",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n  \"board\": \"XOXOXOXOX\",\r\n  \"status\": \"winner\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://demo25-main.onrender.com/api/games/9",
-					"protocol": "https",
-					"host": [
-						"demo25-main",
-						"onrender",
-						"com"
-					],
-					"path": [
-						"api",
-						"games",
-						"9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Game",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "https://demo25-main.onrender.com/api/games/9",
-					"protocol": "https",
-					"host": [
-						"demo25-main",
-						"onrender",
-						"com"
-					],
-					"path": [
-						"api",
-						"games",
-						"9"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Get Leaderboard",
 			"request": {
 				"method": "GET",
@@ -207,6 +52,27 @@
 					"path": [
 						"api",
 						"leaderboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/history",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"history"
 					]
 				}
 			},
