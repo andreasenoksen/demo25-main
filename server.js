@@ -1,75 +1,95 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import { TicTacToeTree } from "./utils/ticTacToeTree.mjs";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import pkg from 'pg';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load environment variables from .env file
+dotenv.config();
+
+const { Pool } = pkg;
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+// Set up the PostgreSQL connection using pg and dotenv
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,  // Required for connecting to PostgreSQL on Render
+  },
+});
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "public")));
-
-let games = {};
-let leaderboard = {};
-
-app.get("/", (req, res) => {
-    res.send("Tic-Tac-Toe API is running! 🎲");
-});
-
-app.post("/games", (req, res) => {
-    const gameId = Date.now().toString();
-    games[gameId] = new TicTacToeTree();
-    res.status(201).json({ gameId, board: games[gameId].root.state });
-});
-
-app.get("/games/:gameId", (req, res) => {
-    const game = games[req.params.gameId];
-    if (!game) return res.status(404).json({ error: "Game not found" });
-    res.json({ board: game.root.state });
-});
-
-app.put("/games/:gameId/move", (req, res) => {
-    const { gameId } = req.params;
-    const { moveIndex, player } = req.body;
-
-    if (!games[gameId]) return res.status(404).json({ error: "Game not found" });
-
-    let newNode = games[gameId].insertMove(games[gameId].root, moveIndex, player);
-    if (!newNode) return res.status(400).json({ error: "Invalid move" });
-
-    let winner = games[gameId].findWinner(newNode);
-    res.json({ board: newNode.state, winner });
-});
-
-app.post("/games/:gameId/winner", (req, res) => {
-    const { gameId } = req.params;
-    const { winner } = req.body;
-
-    if (!games[gameId] || !winner) return res.status(400).json({ error: "Invalid game or winner" });
-
-    if (!leaderboard[winner]) {
-        leaderboard[winner] = 0;
+// Test the connection
+app.get('/', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT NOW()');
+      res.send(`Database connected! Current time: ${result.rows[0].now}`);
+    } catch (err) {
+      console.error('Database connection error:', err);
+      res.status(500).send('Error connecting to the database');
     }
-    leaderboard[winner] += 1;
+  });
+  
 
-    res.json({ message: `Leaderboard updated: ${winner} now has ${leaderboard[winner]} wins.` });
+// CRUD Endpoints for the Tic-Tac-Toe Game
+app.post('/api/games', async (req, res) => {
+  const { playerX, playerO, board, status } = req.body;
+  try {
+    const result = await pool.query(
+      'INSERT INTO games (player_x, player_o, board, status) VALUES ($1, $2, $3, $4) RETURNING *',
+      [playerX, playerO, board, status]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error creating game');
+  }
 });
 
-app.get("/leaderboard", (req, res) => {
-    res.json(leaderboard);
+app.get('/api/games', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM games');
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching games');
+  }
 });
 
-app.delete("/games/:gameId", (req, res) => {
-    delete games[req.params.gameId];
-    res.status(204).send();
+app.put('/api/games/:id', async (req, res) => {
+  const { id } = req.params;
+  const { board, status } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE games SET board = $1, status = $2 WHERE id = $3 RETURNING *',
+      [board, status, id]
+    );
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error updating game');
+  }
 });
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+app.delete('/api/games/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM games WHERE id = $1', [id]);
+    res.send('Game deleted');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error deleting game');
+  }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
