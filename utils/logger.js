@@ -3,6 +3,6 @@ const logger = (req, res, next) => {
     const time = new Date().toISOString();
     console.log(`[${time}] ${method} to ${url}`);
     next();
-};
+    };
 
 export default logger;

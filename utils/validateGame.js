@@ -6,6 +6,6 @@ const validateGame = (req, res, next) => {
     }
 
     next();
-};
+    };
 
 export default validateGame;
