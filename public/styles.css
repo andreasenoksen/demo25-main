@@ -3,29 +3,27 @@ body {
     color: #FFFFFF;
     font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 5vw;
+    padding: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5vh;
+    gap: 30px;
 }
 
 h1 {
-    font-size: 8vw;
+    font-size: 75px;
     margin-bottom: 0px;
 }
 
 .inputs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    gap: 30px;
+    margin-bottom: 0px;
 }
 
 input {
-    padding: 1em;
-    width: 80%;
-    max-width: 300px;
+    padding: 15px;
+    width: 200px;
     background-color: #2e2e2e;
     color: #fff;
     border: none;
@@ -35,22 +33,19 @@ input {
 
 .container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    gap: 30px;
 }
 
 .game, .leaderboard, .history {
     background-color: #1e1e1e;
-    padding: 5vw;
+    padding: 30px;
     border-radius: 16px;
     box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    max-width: 400px;
 }
 
 .game {
-    height: auto;
+    width: 400px;
+    height: 560px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -60,23 +55,13 @@ input {
 
 .board {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(3, 100px);
     gap: 15px;
-    width: 100%;
 }
 
 .cell {
-    width: 100%;
-    padding-top: 100%;
-    position: relative;
-}
-
-.cell div {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    width: 100px;
+    height: 100px;
     background-color: #2e2e2e;
     border-radius: 8px;
     display: flex;
@@ -85,20 +70,54 @@ input {
     color: #fff;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     h1 {
-        font-size: 4vw;
+        font-size: 50px;
     }
-    .inputs, .container {
-        gap: 30px;
+
+    .inputs {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    input {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .game, .leaderboard, .history {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .board {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .cell {
+        width: 80px;
+        height: 80px;
     }
 }
 
-@media (min-width: 1024px) {
-    .game, .leaderboard, .history {
-        max-width: 500px;
+@media (max-width: 480px) {
+    h1 {
+        font-size: 36px;
     }
-    .board {
-        grid-template-columns: repeat(3, 1fr);
+
+    .game, .leaderboard, .history {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+    .cell {
+        width: 60px;
+        height: 60px;
     }
 }
