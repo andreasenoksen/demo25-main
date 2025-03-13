@@ -1,0 +1,220 @@
+{
+	"info": {
+		"_postman_id": "959f2a4c-550d-4dae-bab5-b2593540b5f6",
+		"name": "Tic-Tac-Toe API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42561409"
+	},
+	"item": [
+		{
+			"name": "Create New Game",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"player_x\": \"Alice\",\r\n    \"player_o\": \"Bob\",\r\n    \"board\": \"---------\",\r\n    \"status\": \"ongoing\",\r\n    \"winner\": \"\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/games",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"games"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Game",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"board\": \"XO-XO-OXO\",\r\n    \"status\": \"completed\",\r\n    \"winner\": \"Alice\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/games/40",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"games",
+						"40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Game by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/games/40",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"games",
+						"40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Game",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/games/40",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"games",
+						"40"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Leaderboard",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"winner\": \"Alice\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/leaderboard",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"leaderboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Leaderboard",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/leaderboard",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"leaderboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Game History",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://demo25-main.onrender.com/api/history",
+					"protocol": "https",
+					"host": [
+						"demo25-main",
+						"onrender",
+						"com"
+					],
+					"path": [
+						"api",
+						"history"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

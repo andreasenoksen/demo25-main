@@ -112,8 +112,9 @@
         }
 
         .leaderboard, .history {
-            width: 300px;
+            width: 380px;
             height: 240px;
+            overflow-y: auto;
         }
 
         h3 {
@@ -124,7 +125,9 @@
         ul {
             padding-left: 20px;
             line-height: 1.8;
+            word-wrap: break-word;
         }
+
     </style>
 </head>
 
@@ -167,6 +170,8 @@
         let currentPlayer = "X";
         let gameBoard = ["", "", "", "", "", "", "", "", ""];
         let winner = null;
+        let playerXName = "";
+        let playerOName = "";
 
         function renderBoard() {
             board.innerHTML = "";
@@ -184,18 +189,20 @@
                 gameBoard[index] = currentPlayer;
                 if (checkWinner()) {
                     winner = currentPlayer;
-                    message.textContent = `Player ${winner} Wins!`;
+                    const winnerName = winner === "X" ? playerXName : playerOName;
+                    message.textContent = `${winnerName} Wins!`;
                     restartBtn.style.display = "block";
-                    await updateLeaderboard(winner);
+                    await updateLeaderboard(winnerName);
+                    await saveGame(winnerName);
                 } else if (!gameBoard.includes("")) {
                     message.textContent = "It's a Draw!";
                     restartBtn.style.display = "block";
+                    await saveGame("Draw");
                 } else {
                     currentPlayer = currentPlayer === "X" ? "O" : "X";
                     message.textContent = `Player ${currentPlayer}'s Turn`;
                 }
                 renderBoard();
-                await saveGame();
             }
         }
 
@@ -220,26 +227,26 @@
             renderBoard();
         }
 
-        async function saveGame() {
+        async function saveGame(winnerName) {
             await fetch(`${apiUrl}/games`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    player_x: document.getElementById("playerX").value,
-                    player_o: document.getElementById("playerO").value,
+                    player_x: playerXName,
+                    player_o: playerOName,
                     board: gameBoard.join(""),
                     status: winner ? "completed" : "ongoing",
-                    winner: winner || "Draw"
+                    winner: winnerName
                 })
             });
             fetchGameHistory();
         }
 
-        async function updateLeaderboard(player) {
+        async function updateLeaderboard(winnerName) {
             await fetch(`${apiUrl}/leaderboard`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ winner: player })
+                body: JSON.stringify({ winner: winnerName })
             });
             fetchLeaderboard();
         }
@@ -258,10 +265,13 @@
             const data = await response.json();
             historyList.innerHTML = "";
             data.slice(0, 5).forEach(game => {
-                historyList.innerHTML += `<li>${game.player_x} vs ${game.player_o} - ${game.winner}</li>`;
+                historyList.innerHTML += `<li>${game.player_x} (X) vs ${game.player_o} (O) - ${game.winner === "Draw" ? "Draw" : `${game.winner} Won`}</li>`;
             });
         }
 
+        document.getElementById("playerX").onchange = (e) => playerXName = e.target.value;
+        document.getElementById("playerO").onchange = (e) => playerOName = e.target.value
+        
         renderBoard();
         fetchLeaderboard();
         fetchGameHistory();
