@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 import pkg from 'pg';
 import path from 'path';
 
+import logger from './utils/logger.js';
+import validateGame from './utils/validateGame.js';
+import errorHandler from './utils/errorHandler.js';
+
 dotenv.config();
 const { Pool } = pkg;
 
@@ -13,7 +17,8 @@ const port = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL Database Setup
+app.use(logger);
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -21,16 +26,13 @@ const pool = new Pool({
     },
 });
 
-// Serve static files
 app.use(express.static('public'));
 
-// Serve index.html on root route
 app.get('/', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
-// Create new game
-app.post('/api/games', async (req, res) => {
+app.post('/api/games', validateGame, async (req, res, next) => {
     const { player_x, player_o, board, status, winner } = req.body;
     try {
         const result = await pool.query(
@@ -39,12 +41,11 @@ app.post('/api/games', async (req, res) => {
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Get game by ID
-app.get('/api/games/:id', async (req, res) => {
+app.get('/api/games/:id', async (req, res, next) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT * FROM games WHERE id = $1', [id]);
@@ -54,12 +55,11 @@ app.get('/api/games/:id', async (req, res) => {
             res.json(result.rows[0]);
         }
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Update game
-app.put('/api/games/:id', async (req, res) => {
+app.put('/api/games/:id', async (req, res, next) => {
     const { id } = req.params;
     const { board, status, winner } = req.body;
     try {
@@ -69,45 +69,43 @@ app.put('/api/games/:id', async (req, res) => {
         );
         res.json(result.rows[0]);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Update Leaderboard
-app.post('/api/leaderboard', async (req, res) => {
+app.post('/api/leaderboard', async (req, res, next) => {
     const { winner } = req.body;
     try {
-        const result = await pool.query(
+        await pool.query(
             'INSERT INTO leaderboard (player, wins) VALUES ($1, 1) ON CONFLICT (player) DO UPDATE SET wins = leaderboard.wins + 1',
             [winner]
         );
         res.status(201).send('Leaderboard updated');
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Get Leaderboard
-app.get('/api/leaderboard', async (req, res) => {
+app.get('/api/leaderboard', async (req, res, next) => {
     try {
         const result = await pool.query('SELECT * FROM leaderboard ORDER BY wins DESC');
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Get Game History
-app.get('/api/history', async (req, res) => {
+app.get('/api/history', async (req, res, next) => {
     try {
         const result = await pool.query('SELECT * FROM games ORDER BY created_at DESC');
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        next(err);
     }
 });
 
-// Start server
+app.use(errorHandler);
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

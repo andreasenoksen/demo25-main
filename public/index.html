@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe Modern</title>
+    <title>Tic-Tac-Toe</title>
     <style>
         body {
             background-color: #121212;
@@ -52,7 +52,7 @@
 
         .game {
             width: 400px;
-            height: 500px;
+            height: 560px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -271,7 +271,7 @@
 
         document.getElementById("playerX").onchange = (e) => playerXName = e.target.value;
         document.getElementById("playerO").onchange = (e) => playerOName = e.target.value
-        
+
         renderBoard();
         fetchLeaderboard();
         fetchGameHistory();
