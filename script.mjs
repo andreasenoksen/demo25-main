@@ -68,9 +68,9 @@ function handleQuoteRequest(req, res) {
 server.get('/session', (req, res) => {
     if (!req.session.views) {
         req.session.views = 1;
-    } else {
-        req.session.views++;
-    }
+        } else {
+            req.session.views++;
+        }
     res.send(`Session views: ${req.session.views}`);
 });
 
