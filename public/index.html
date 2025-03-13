@@ -10,40 +10,62 @@
             color: #FFFFFF;
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 20px;
-        }
-        .container {
+            padding: 40px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            gap: 30px;
         }
-        .game, .leaderboard, .history {
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
-        }
-        .input-box {
+
+        h1 {
+            font-size: 36px;
             margin-bottom: 20px;
         }
+
+        .inputs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
         input {
-            padding: 10px;
-            width: 100%;
+            padding: 15px;
+            width: 200px;
             background-color: #2e2e2e;
             color: #fff;
             border: none;
             border-radius: 8px;
             outline: none;
         }
+
+        .container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .game, .leaderboard, .history {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .game {
+            width: 400px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
-            gap: 10px;
+            gap: 15px;
         }
+
         .cell {
             width: 100px;
             height: 100px;
@@ -51,50 +73,97 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            border-radius: 8px;
+            font-size: 32px;
+            border-radius: 12px;
             cursor: pointer;
             transition: transform 0.3s ease;
         }
+
         .cell:hover {
             transform: scale(1.1);
         }
+
         .message {
-            margin-top: 15px;
-            text-align: center;
+            font-size: 18px;
             font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            margin-top: 15px;
+            background-color: #0804fc;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background-color: #0a06e0;
+        }
+
+        .side-box {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .leaderboard, .history {
+            width: 300px;
+            height: 240px;
+        }
+
+        h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        ul {
+            padding-left: 20px;
+            line-height: 1.8;
         }
     </style>
 </head>
+
 <body>
 
-    <div class="container game">
-        <div class="input-box">
-            <input type="text" id="playerX" placeholder="Enter Player X Name">
-            <input type="text" id="playerO" placeholder="Enter Player O Name">
-        </div>
-        <div class="board" id="board"></div>
-        <div class="message" id="message"></div>
+    <h1>Tic-Tac-Toe</h1>
+
+    <div class="inputs">
+        <input type="text" id="playerX" placeholder="Enter Player X Name">
+        <input type="text" id="playerO" placeholder="Enter Player O Name">
     </div>
 
     <div class="container">
-        <div class="leaderboard">
-            <h3>Leaderboard</h3>
-            <ul id="leaderboardList"></ul>
+        <div class="game">
+            <div class="board" id="board"></div>
+            <div class="message" id="message"></div>
+            <button id="restartBtn" style="display:none;" onclick="restartGame()">Restart Game</button>
         </div>
-        <div class="history">
-            <h3>Game History</h3>
-            <ul id="historyList"></ul>
+
+        <div class="side-box">
+            <div class="leaderboard">
+                <h3>Leaderboard</h3>
+                <ul id="leaderboardList"></ul>
+            </div>
+            <div class="history">
+                <h3>Game History</h3>
+                <ul id="historyList"></ul>
+            </div>
         </div>
     </div>
 
     <script>
         const board = document.getElementById("board");
         const message = document.getElementById("message");
+        const restartBtn = document.getElementById("restartBtn");
         const leaderboardList = document.getElementById("leaderboardList");
         const historyList = document.getElementById("historyList");
         const apiUrl = "https://demo25-main.onrender.com/api";
-        
+
         let currentPlayer = "X";
         let gameBoard = ["", "", "", "", "", "", "", "", ""];
         let winner = null;
@@ -116,9 +185,11 @@
                 if (checkWinner()) {
                     winner = currentPlayer;
                     message.textContent = `Player ${winner} Wins!`;
+                    restartBtn.style.display = "block";
                     await updateLeaderboard(winner);
                 } else if (!gameBoard.includes("")) {
                     message.textContent = "It's a Draw!";
+                    restartBtn.style.display = "block";
                 } else {
                     currentPlayer = currentPlayer === "X" ? "O" : "X";
                     message.textContent = `Player ${currentPlayer}'s Turn`;
@@ -140,6 +211,15 @@
             });
         }
 
+        async function restartGame() {
+            gameBoard = ["", "", "", "", "", "", "", "", ""];
+            winner = null;
+            currentPlayer = "X";
+            message.textContent = "";
+            restartBtn.style.display = "none";
+            renderBoard();
+        }
+
         async function saveGame() {
             await fetch(`${apiUrl}/games`, {
                 method: "POST",
@@ -149,7 +229,7 @@
                     player_o: document.getElementById("playerO").value,
                     board: gameBoard.join(""),
                     status: winner ? "completed" : "ongoing",
-                    winner: winner || ""
+                    winner: winner || "Draw"
                 })
             });
             fetchGameHistory();
@@ -178,7 +258,7 @@
             const data = await response.json();
             historyList.innerHTML = "";
             data.slice(0, 5).forEach(game => {
-                historyList.innerHTML += `<li>${game.player_x} vs ${game.player_o} - ${game.winner || "Draw"}</li>`;
+                historyList.innerHTML += `<li>${game.player_x} vs ${game.player_o} - ${game.winner}</li>`;
             });
         }
 
