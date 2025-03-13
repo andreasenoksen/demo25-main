@@ -1,11 +1,8 @@
-const validateGame = (req, res, next) => {
+export default function validateGame(req, res, next) {
     const { player_x, player_o, board, status } = req.body;
-
     if (!player_x || !player_o || !board || !status) {
-        return res.status(400).json({ error: "All fields are required for game creation!" });
+      return res.status(400).json({ error: 'Missing required game fields' });
     }
-
     next();
-    };
-
-export default validateGame;
+  }
+  

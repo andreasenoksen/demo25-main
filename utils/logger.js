@@ -1,8 +1,6 @@
-const logger = (req, res, next) => {
-    const { method, url } = req;
-    const time = new Date().toISOString();
-    console.log(`[${time}] ${method} to ${url}`);
+export default function logger(req, res, next) {
+    const timestamp = new Date().toISOString();
+    console.info(`[${timestamp}] ${req.method} ${req.url}`);
     next();
-    };
-
-export default logger;
+  }
+  
