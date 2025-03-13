@@ -27,11 +27,11 @@ app.get('/', (req, res) => {
 
 // Create a new game
 app.post('/api/games', async (req, res) => {
-    const { player_x, player_o, board, status } = req.body;
+    const { player_x, player_o, board, status, winner } = req.body;
     try {
         const result = await pool.query(
-            'INSERT INTO games (player_x, player_o, board, status) VALUES ($1, $2, $3, $4) RETURNING *',
-            [player_x, player_o, board, status]
+            'INSERT INTO games (player_x, player_o, board, status, winner) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [player_x, player_o, board, status, winner]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -39,12 +39,25 @@ app.post('/api/games', async (req, res) => {
     }
 });
 
-// Get leaderboard
+// Update leaderboard
+app.post('/api/leaderboard', async (req, res) => {
+    const { winner } = req.body;
+    try {
+        await pool.query(`
+            INSERT INTO leaderboard (player, wins)
+            VALUES ($1, 1)
+            ON CONFLICT (player) DO UPDATE SET wins = leaderboard.wins + 1`, [winner]);
+        res.status(200).send('Leaderboard Updated');
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Fetch leaderboard
 app.get('/api/leaderboard', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT player_x AS player, COUNT(*) AS wins FROM games WHERE status = $1 GROUP BY player_x ORDER BY wins DESC',
-            ['winner']
+            'SELECT * FROM leaderboard ORDER BY wins DESC'
         );
         res.json(result.rows);
     } catch (err) {
@@ -52,26 +65,11 @@ app.get('/api/leaderboard', async (req, res) => {
     }
 });
 
-// Get game history
+// Fetch game history
 app.get('/api/history', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM games ORDER BY created_at DESC LIMIT 10');
         res.json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Update game status
-app.put('/api/games/:id', async (req, res) => {
-    const { id } = req.params;
-    const { board, status } = req.body;
-    try {
-        const result = await pool.query(
-            'UPDATE games SET board = $1, status = $2 WHERE id = $3 RETURNING *',
-            [board, status, id]
-        );
-        res.json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

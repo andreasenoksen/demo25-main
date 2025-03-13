@@ -9,79 +9,95 @@
             color: #FFFFFF;
             font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
-            padding-top: 30px;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
         }
 
         .container {
-            text-align: center;
+            display: flex;
+            gap: 30px;
         }
 
         .board {
             display: grid;
             grid-template-columns: repeat(3, 100px);
-            gap: 5px;
-            margin-top: 20px;
+            gap: 10px;
         }
 
         .cell {
             width: 100px;
             height: 100px;
             border: 2px solid #0804fc;
-            font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 36px;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .leaderboard, .history {
-            margin-top: 20px;
-            text-align: left;
+        .cell:hover {
+            background-color: #0804fc;
+        }
+
+        .sidebar {
+            width: 300px;
         }
 
         .highlight {
             color: #0804fc;
         }
+
+        .btn {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #0804fc;
+            border: none;
+            color: #FFF;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .btn:hover {
+            background-color: #0603b1;
+        }
     </style>
 </head>
 <body>
+    <h1>Tic-Tac-Toe Game</h1>
+    
+    <input id="playerX" placeholder="Player X Name">
+    <input id="playerO" placeholder="Player O Name">
+    <button onclick="startGame()" class="btn">Start Game</button>
+    
+    <div id="status"></div>
+    
     <div class="container">
-        <h1>Tic-Tac-Toe Game</h1>
-        
-        <input id="playerX" placeholder="Player X Name">
-        <input id="playerO" placeholder="Player O Name">
-        <button onclick="startGame()">Start Game</button>
-
         <div class="board" id="board"></div>
-        <div id="status"></div>
 
-        <div class="leaderboard">
+        <div class="sidebar">
             <h3 class="highlight">Leaderboard</h3>
             <ul id="leaderboard"></ul>
-        </div>
 
-        <div class="history">
             <h3 class="highlight">Game History</h3>
             <ul id="history"></ul>
         </div>
     </div>
 
+    <button id="restart" class="btn" style="display:none;" onclick="restartGame()">Restart Game</button>
+
     <script>
         let currentPlayer = 'X';
         let boardState = ["", "", "", "", "", "", "", "", ""];
+        let playerX = '';
+        let playerO = '';
 
-        async function startGame() {
-            const playerX = document.getElementById('playerX').value;
-            const playerO = document.getElementById('playerO').value;
-            await fetch('/api/games', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_x: playerX, player_o: playerO, board: "", status: "ongoing" })
-            });
+        function startGame() {
+            playerX = document.getElementById('playerX').value;
+            playerO = document.getElementById('playerO').value;
+            document.getElementById('status').innerText = `Player ${currentPlayer}'s Turn`;
             renderBoard();
-            loadLeaderboard();
-            loadHistory();
         }
 
         function renderBoard() {
@@ -96,37 +112,42 @@
             });
         }
 
-        function makeMove(index) {
+        async function makeMove(index) {
             if (!boardState[index]) {
                 boardState[index] = currentPlayer;
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                if (checkWinner()) {
+                    document.getElementById('status').innerText = `${currentPlayer} Wins!`;
+                    document.getElementById('restart').style.display = 'block';
+                    await fetch('/api/leaderboard', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ winner: currentPlayer })
+                    });
+                } else {
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    document.getElementById('status').innerText = `Player ${currentPlayer}'s Turn`;
+                }
                 renderBoard();
-                document.getElementById('status').innerText = `Player ${currentPlayer}'s turn`;
             }
         }
 
-        async function loadLeaderboard() {
-            const res = await fetch('/api/leaderboard');
-            const data = await res.json();
-            const list = document.getElementById('leaderboard');
-            list.innerHTML = '';
-            data.forEach(player => {
-                const li = document.createElement('li');
-                li.innerText = `${player.player}: ${player.wins}`;
-                list.appendChild(li);
-            });
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winPatterns.some(pattern =>
+                pattern.every(i => boardState[i] === currentPlayer)
+            );
         }
 
-        async function loadHistory() {
-            const res = await fetch('/api/history');
-            const data = await res.json();
-            const list = document.getElementById('history');
-            list.innerHTML = '';
-            data.forEach(game => {
-                const li = document.createElement('li');
-                li.innerText = `Game ID ${game.id} - ${game.player_x} vs ${game.player_o}`;
-                list.appendChild(li);
-            });
+        function restartGame() {
+            boardState = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = 'X';
+            document.getElementById('restart').style.display = 'none';
+            document.getElementById('status').innerText = `Player ${currentPlayer}'s Turn`;
+            renderBoard();
         }
     </script>
 </body>
