@@ -20,9 +20,11 @@ app.use(express.json());
 app.use(logger);
 
 app.use(express.static('public', {
-    setHeaders: (res, filePath) => {
-        if (filePath.endsWith('.json')) {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.json')) {
             res.set('Content-Type', 'application/json');
+        } else if (path.endsWith('.css')) {
+            res.set('Content-Type', 'text/css');
         }
     }
 }));
