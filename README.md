@@ -1,61 +1,78 @@
-# Tic-Tac-Toe API & PWA
+# Tic-Tac-Toe Game
 
-This is a Tic-Tac-Toe game built with Node.js and Express. The application functions as both a REST API for managing games and as a Progressive Web App (PWA) that can be installed on your device.
+**Live Demo:** [Visit the Live App on Render](https://demo25-main.onrender.com)
 
-**Live Version:** [https://demo25-main.onrender.com/](https://demo25-main.onrender.com/)
+---
 
-## Installation and Running the Project
+## About the Game
 
-To run the project locally, follow these steps:
+This is a classic **Tic-Tac-Toe** game where two players (X and O) compete by taking turns to mark spaces in a 3x3 grid. The first player to align three marks horizontally, vertically, or diagonally wins the game. If all spaces are filled without a winner, the game ends in a draw.
 
-### 1. Download the Project
-Clone the repository from GitHub:
+### Features
+- **Player Input:** Players can enter their names for personalized gameplay.
+- **Leaderboard:** Displays the top 5 players with the highest number of wins.
+- **Game History:** Shows the last 5 games played, including player names and the winner or if it was a draw.
+- **Restart Game:** Allows restarting the game after a win or draw.
+- **PWA (Progressive Web App):** Installable on devices and works offline.
+- **Responsive Design:** Optimized for both desktop and mobile devices.
 
-```sh
-git clone https://github.com/andreasenoksen/demo25-main.git
-cd demo25-main
-```
-
-### 2. Install Dependencies
-Run the following command to install necessary packages:
-
-```sh
-npm install
-```
-
-### 3. Start the Server
-To start the server locally, use:
-
-```sh
-npm start
-```
-
-The server will run on `http://localhost:3000`.
-
-## How the Game Works
-
-The game works by allowing a player to start a new game via the API. Players can then make moves, and the system will check if there is a winner. Results can be stored in a leaderboard.
-
-### Game Flow:
-1. Start a new game.
-2. Players make moves by submitting their chosen position.
-3. The system validates the move and updates the game board.
-4. When a player wins, the result is recorded in the leaderboard.
-5. Games can be retrieved, deleted, or updated via the API.
-
-## PWA (Progressive Web App)
-
-This application is a PWA, meaning you can install it as an app on your device. This allows you to play offline.
-
-To install:
-1. Open the application in a browser that supports PWA (e.g., Chrome or Edge).
-2. Click the install button that appears in the address bar.
+---
 
 ## Technologies Used
-- HTML
-- CSS
-- JavaScript
-- Node.js
-- Express
-- Socket.io
-- Service Workers for PWA support
+
+- **HTML, CSS, JavaScript:** Core technologies for building the frontend and interactivity.
+- **Node.js and Express.js:** Backend server setup for handling API requests and serving static files.
+- **PostgreSQL:** Database for storing game data, leaderboard, and history.
+- **Render:** Hosting platform for both the server and PostgreSQL database.
+- **PGAdmin 4:** GUI for managing the PostgreSQL database.
+- **Postman:** Used for testing API endpoints during development.
+- **Service Worker:** For caching static assets and enabling offline support.
+- **Manifest.json:** For configuring PWA properties and icons.
+
+---
+
+## Project Setup Explanation
+
+- **Separation of Concerns:**
+  - The **frontend** (HTML, CSS, JS) is served from the `public` directory.
+  - The **backend** handles API requests and manages database interactions.
+  - Middleware is used for **logging**, **error handling**, and **input validation**.
+
+- **Why Render?**
+  - Simplified deployment for both the server and database.
+  - Scalable and easy to manage through GitHub integration.
+
+- **Database Persistence:**
+  - PostgreSQL is used for its reliability and integration with Render.
+  - Data persists between server restarts, ensuring long-term record keeping.
+
+- **Offline Functionality:**
+  - The service worker caches essential assets for offline use.
+  - Users can play the game without an active internet connection after initial load.
+
+---
+
+## How the Leaderboard and Game History Work
+
+- **Leaderboard:**
+  - Displays the top 5 players based on the number of wins.
+  - Automatically updates after each game completion.
+
+- **Game History:**
+  - Shows details of the last 5 games, including:
+    - Player names (X and O).
+    - The winner or if the game was a draw.
+
+---
+
+## Notes
+
+- The service worker will cache necessary files for offline use.
+- Remember to increment the cache version in `sw.js` when updating files.
+- Use `Postman` to test API endpoints and verify data flow.
+- PostgreSQL is managed via `PGAdmin 4` for local testing and Render for production.
+
+---
+
+## Author
+Developed by Andreas Enoksen
