@@ -1,13 +1,12 @@
+// Importing necessary libraries
 import express from 'express';
 import cors from 'cors';
 import pkg from 'pg';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
 const { Pool } = pkg;
-
 const app = express();
 const port = process.env.PORT || 8000;
 
@@ -23,18 +22,18 @@ const pool = new Pool({
   },
 });
 
-// Test the connection
+// Test Database Connection
 app.get('/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
     res.send(`Database connected! Current time: ${result.rows[0].now}`);
   } catch (err) {
     console.error('Database connection error:', err);
-    res.status(500).send('Error connecting to the database');
+    res.status(500).send(`Error connecting to the database: ${err.message}`);
   }
 });
 
-// CRUD Endpoints for the Tic-Tac-Toe Game
+// Create a new game
 app.post('/api/games', async (req, res) => {
   const { playerX, playerO, board, status } = req.body;
   try {
@@ -42,13 +41,14 @@ app.post('/api/games', async (req, res) => {
       'INSERT INTO games (player_x, player_o, board, status) VALUES ($1, $2, $3, $4) RETURNING *',
       [playerX, playerO, board, status]
     );
-    res.json(result.rows[0]);
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error creating game');
   }
 });
 
+// Get all games
 app.get('/api/games', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM games');
@@ -59,6 +59,22 @@ app.get('/api/games', async (req, res) => {
   }
 });
 
+// Get a single game by ID
+app.get('/api/games/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM games WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).send('Game not found');
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving the game');
+  }
+});
+
+// Update a game by ID
 app.put('/api/games/:id', async (req, res) => {
   const { id } = req.params;
   const { board, status } = req.body;
@@ -67,13 +83,17 @@ app.put('/api/games/:id', async (req, res) => {
       'UPDATE games SET board = $1, status = $2 WHERE id = $3 RETURNING *',
       [board, status, id]
     );
+    if (result.rows.length === 0) {
+      return res.status(404).send('Game not found');
+    }
     res.json(result.rows[0]);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error updating game');
+    res.status(500).send('Error updating the game');
   }
 });
 
+// Delete a game by ID
 app.delete('/api/games/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -85,7 +105,20 @@ app.delete('/api/games/:id', async (req, res) => {
   }
 });
 
-// Only one app.listen() call
+// Get leaderboard (mock implementation)
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT player_x AS player, COUNT(*) AS wins FROM games WHERE status = $1 GROUP BY player_x ORDER BY wins DESC',
+      ['winner']
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching leaderboard');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
