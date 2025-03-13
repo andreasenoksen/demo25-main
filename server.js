@@ -19,14 +19,20 @@ app.use(express.json());
 
 app.use(logger);
 
+app.use(express.static('public', {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.json')) {
+            res.set('Content-Type', 'application/json');
+        }
+    }
+}));
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false,
     },
 });
-
-app.use(express.static('public'));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
