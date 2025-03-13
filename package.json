@@ -8,6 +8,6 @@
         "uuid": "^11.0.5"
     },
     "scripts": {
-        "start": "node server.js"
+        "start": "node database.js && node server.js"
     }
 }
