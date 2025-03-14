@@ -68,7 +68,7 @@ This is a classic **Tic-Tac-Toe** game where two players (X and O) compete by ta
 ## Notes
 
 - The service worker will cache necessary files for offline use.
-- Remember to increment the cache version in `sw.js` when updating files.
+- Remember to increment the cache version in `service-worker.js` when updating files.
 - Use `Postman` to test API endpoints and verify data flow.
 - PostgreSQL is managed via `PGAdmin 4` for local testing and Render for production.
 
